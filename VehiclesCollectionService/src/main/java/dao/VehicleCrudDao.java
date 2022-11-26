@@ -79,7 +79,10 @@ public class VehicleCrudDao {
         } else
             query.orderBy(builder.desc(sortParam(root, type.name())));
 
-        query.where(preparePredicatesFromFilter(builder, fieldToFilter, root));
+        Predicate[] predicates = preparePredicatesFromFilter(builder, fieldToFilter, root);
+        if (predicates.length > 0)
+            query.where(predicates);
+
         List<Vehicle> vehicles = em.createQuery(query)
                 .setFirstResult((page - 1) * limit)
                 .setMaxResults(limit)
@@ -95,7 +98,10 @@ public class VehicleCrudDao {
         CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
         Root<Vehicle> root = query.from(Vehicle.class);
         query.select(root);
-        query.where(preparePredicatesFromFilter(builder, fieldToFilter, root));
+        Predicate[] predicates = preparePredicatesFromFilter(builder, fieldToFilter, root);
+        if (predicates.length > 0)
+            query.where(predicates);
+
         List<Vehicle> vehicles = em.createQuery(query)
                 .setFirstResult((page - 1) * limit)
                 .setMaxResults(limit)
