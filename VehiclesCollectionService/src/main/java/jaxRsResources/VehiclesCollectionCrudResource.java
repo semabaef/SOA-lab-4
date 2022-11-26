@@ -5,7 +5,6 @@ import models.dto.vehicle.VehicleNoIdDTO;
 import models.dto.vehicle.VehicleWithIdDTO;
 import models.enums.VehicleType;
 import services.VehicleService;
-import utils.parsers.XmlParser;
 
 import javax.ejb.EJB;
 import javax.ws.rs.*;
@@ -21,20 +20,17 @@ public class VehiclesCollectionCrudResource {
     @EJB
     private VehicleService vehicleService;
 
-    @EJB
-    private XmlParser xmlParser;
-
 
     @POST
-    public Response addNewVehicle(String xmlString) {
-        VehicleNoIdDTO vehicleNoIdDTO = xmlParser.parseXmlToVehicleNoId(xmlString);
-        return Response.ok(vehicleService.addNewVehicle(vehicleNoIdDTO)).build();
+    public Response addNewVehicle(VehicleNoIdDTO vehicle) {
+        vehicle.validate();
+        return Response.ok(vehicleService.addNewVehicle(vehicle)).build();
     }
 
     @PUT
-    public Response updateVehicle(String xmlString) {
-        VehicleWithIdDTO vehicleWithIdDTO = xmlParser.parseXmlToVehicleWithId(xmlString);
-        return Response.ok(vehicleService.updateVehicle(vehicleWithIdDTO)).build();
+    public Response updateVehicle(VehicleWithIdDTO vehicle) {
+        vehicle.validate();
+        return Response.ok(vehicleService.updateVehicle(vehicle)).build();
     }
 
 

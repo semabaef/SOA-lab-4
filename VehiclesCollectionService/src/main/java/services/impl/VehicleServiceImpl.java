@@ -3,7 +3,8 @@ package services.impl;
 import dao.CoordinatesDao;
 import dao.VehicleCrudDao;
 import dao.VehicleExtraOperationsDao;;
-import exceptions.NotFoundException;
+import exceptions.ExceptionDescription;
+import exceptions.HttpApplicationException;
 import lombok.SneakyThrows;
 import models.dto.common.VehicleFilterDTO;
 import models.dto.vehicle.VehicleNoIdDTO;
@@ -91,6 +92,10 @@ public class VehicleServiceImpl implements VehicleService {
             fieldToFilter.put("name", filterDTO.getName());
         if (filterDTO.getCreationDate() != null)
             fieldToFilter.put("creationDate", filterDTO.getCreationDate());
+        if (filterDTO.getX() != null)
+            fieldToFilter.put("x", filterDTO.getX().toString());
+        if (filterDTO.getY() != null)
+            fieldToFilter.put("y", filterDTO.getY().toString());
         if (filterDTO.getEnginePower() != null)
             fieldToFilter.put("enginePower", filterDTO.getEnginePower().toString());
         if (filterDTO.getNumberOfWheels() != null)
@@ -99,16 +104,6 @@ public class VehicleServiceImpl implements VehicleService {
             fieldToFilter.put("distanceTravelled", filterDTO.getDistanceTravelled().toString());
         if (filterDTO.getType() != null)
             fieldToFilter.put("type", filterDTO.getType().toString());
-
-        if (filterDTO.getX() != null || filterDTO.getY() != null) {
-            String key = checkCoordinatesInDTO(filterDTO.getX(), filterDTO.getY());
-            if (key.equals("x_y"))
-                fieldToFilter.put("x_y", filterDTO.getX().toString() + " " + filterDTO.getY().toString());
-            if (key.equals("x"))
-                fieldToFilter.put("x", String.valueOf(filterDTO.getX()));
-            if (key.equals("y"))
-                fieldToFilter.put("y", String.valueOf(filterDTO.getY()));
-        }
 
         if (filterDTO.getSortBy() != null)
             //ищем с фильтром и сортируем
@@ -146,22 +141,11 @@ public class VehicleServiceImpl implements VehicleService {
         return entityConvector.convertAndCheckListVehicles(vehicles);
     }
 
-    private Vehicle findAndCheckVehicleById(Long id) throws NotFoundException {
+    private Vehicle findAndCheckVehicleById(Long id) {
         Vehicle vehicle = vehicleCrudDao.findById(id);
         if (vehicle == null)
-            throw new NotFoundException();
+            throw new HttpApplicationException(ExceptionDescription.OBJECT_VEHICLE_NOT_FOUND);
         return vehicle;
     }
-
-    private String checkCoordinatesInDTO(Float x, Long y) {
-        if (x != null && y != null)
-            return "x_y";
-        if (x != null)
-            return "x";
-        if (y != null)
-            return "y";
-        return "";
-    }
-
 
 }

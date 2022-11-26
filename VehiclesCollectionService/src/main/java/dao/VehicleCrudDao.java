@@ -2,10 +2,7 @@ package dao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import models.entities.Vehicle;
 import models.enums.SortByType;
 import models.enums.SortOrder;
@@ -31,10 +28,12 @@ public class VehicleCrudDao {
 
     public Vehicle findById(Long id) {
         Vehicle vehicle = null;
+        Session session = getSessionFactory().openSession();
         try {
-            vehicle = getSessionFactory().openSession().get(Vehicle.class, id);
+            vehicle = session.get(Vehicle.class, id);
         } catch (NoResultException ignored) {
         }
+        session.close();
         return vehicle;
     }
 
@@ -76,15 +75,17 @@ public class VehicleCrudDao {
         query.select(root);
 
         if (order.equals(SortOrder.ASC)) {
-            query.orderBy(builder.asc(root.get(type.name())));
+            query.orderBy(builder.asc(sortParam(root, type.name())));
         } else
-            query.orderBy(builder.desc(root.get(type.name())));
+            query.orderBy(builder.desc(sortParam(root, type.name())));
 
         query.where(preparePredicatesFromFilter(builder, fieldToFilter, root));
-        return em.createQuery(query)
+        List<Vehicle> vehicles = em.createQuery(query)
                 .setFirstResult((page - 1) * limit)
                 .setMaxResults(limit)
                 .getResultList();
+        session.close();
+        return vehicles;
     }
 
     public List<Vehicle> getAllMatchingFieldsPageable(Map<String, String> fieldToFilter, Integer page, Integer limit) {
@@ -95,10 +96,12 @@ public class VehicleCrudDao {
         Root<Vehicle> root = query.from(Vehicle.class);
         query.select(root);
         query.where(preparePredicatesFromFilter(builder, fieldToFilter, root));
-        return em.createQuery(query)
+        List<Vehicle> vehicles = em.createQuery(query)
                 .setFirstResult((page - 1) * limit)
                 .setMaxResults(limit)
                 .getResultList();
+        session.close();
+        return vehicles;
     }
 
 
@@ -114,27 +117,12 @@ public class VehicleCrudDao {
                     predicates.add(builder.equal(root.get(entry.getKey()), VehicleType.valueOf(entry.getValue())));
                     break;
                 }
-                case "x_y": {
-                    //0-ой элемент в массиве - это х, 1-ый - y
-                    String xy[] = entry.getValue().split(" ");
-                    if (coordinatesDao.findByXAndY(Float.parseFloat(xy[0]), Long.parseLong(xy[1])) != null) {
-                        Long id = coordinatesDao.findByXAndY(Float.parseFloat(xy[0]), Long.parseLong(xy[1])).getId();
-                        predicates.add(builder.equal(root.get("coordinates_id"), id));
-                    }
-                }
                 case "x": {
-                    if (coordinatesDao.findByX(Float.parseFloat(entry.getValue())) != null)
-                        coordinatesDao.findByX(Float.parseFloat(entry.getValue())).
-                                stream()
-                                .map((coordinates) -> predicates.add(builder.equal(root.get("coordinates_id"), coordinates.getId())));
+                    predicates.add(builder.equal(root.get("coordinates").get("x"), entry.getValue()));
                 }
                 case "y": {
-                    if (coordinatesDao.findByY(Long.parseLong(entry.getValue())) != null)
-                        coordinatesDao.findByY(Long.parseLong(entry.getValue())).
-                                stream()
-                                .map((coordinates) -> predicates.add(builder.equal(root.get("coordinates_id"), coordinates.getId())));
+                    predicates.add(builder.equal(root.get("coordinates").get("y"), entry.getValue()));
                 }
-
                 default: {
                     predicates.add(builder.equal(root.get(entry.getKey()), entry.getValue()));
                 }
@@ -143,5 +131,20 @@ public class VehicleCrudDao {
         return predicates.toArray(new Predicate[0]);
     }
 
-
+    private Path<Object> sortParam(Root<Vehicle> root, String type) {
+        Path<Object> objectPath;
+        switch (type) {
+            case "x": {
+                objectPath = root.get("coordinates").get("x");
+                break;
+            }
+            case "y": {
+                objectPath = root.get("coordinates").get("y");
+                break;
+            }
+            default:
+                objectPath = root.get(type);
+        }
+        return objectPath;
+    }
 }

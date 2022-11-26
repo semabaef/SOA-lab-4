@@ -22,7 +22,7 @@ public class VehicleExtraOperationsDao {
 
     public List<Vehicle> getVehiclesWhereNameLike(String name) {
         return (List<Vehicle>) getSessionFactory().openSession()
-                .createQuery("From Vehicle where name like :name")
+                .createQuery("From Vehicle where name ilike :name")
                 .setParameter("name", name)
                 .getResultList();
     }

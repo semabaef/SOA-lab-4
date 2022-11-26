@@ -1,6 +1,7 @@
 package utils.convectors;
 
-import exceptions.NotFoundException;
+import exceptions.ExceptionDescription;
+import exceptions.HttpApplicationException;
 import models.dto.coordinates.CoordinatesDTO;
 import models.dto.vehicle.VehicleWithIdDTO;
 import models.entities.Coordinates;
@@ -34,9 +35,9 @@ public class EntityConvector {
     }
 
 
-    public List<VehicleWithIdDTO> convertAndCheckListVehicles(List<Vehicle> vehicles) throws NotFoundException {
+    public List<VehicleWithIdDTO> convertAndCheckListVehicles(List<Vehicle> vehicles) {
         if (vehicles.isEmpty())
-            throw new NotFoundException();
+            throw new HttpApplicationException(ExceptionDescription.OBJECT_VEHICLES_NOT_FOUND);
         return convertListVehicleToListDTO(vehicles);
     }
 

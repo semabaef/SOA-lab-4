@@ -21,35 +21,19 @@ public class CoordinatesDao {
         session.close();
     }
 
-    public List<Coordinates> findByX(float x) {
-        return (List<Coordinates>) getSessionFactory().openSession()
-                .createQuery(" From Coordinates where x = :x ")
-                .setParameter("x", x)
-                .getResultList()
-                .stream()
-                .findFirst()
-                .orElse(null);
-    }
-
-    public List<Coordinates> findByY(long y) {
-        return (List<Coordinates>) getSessionFactory().openSession()
-                .createQuery(" From Coordinates where  y = :y")
-                .setParameter("y", y)
-                .getResultList()
-                .stream()
-                .findFirst()
-                .orElse(null);
-    }
 
     public Coordinates findByXAndY(float x, long y) {
         Coordinates coordinates = null;
         try {
-            coordinates = (Coordinates) getSessionFactory().openSession()
+            Session session = getSessionFactory().openSession();
+            coordinates = (Coordinates) session
                     .createQuery(" From Coordinates where x = :x and y = :y")
                     .setParameter("x", x)
                     .setParameter("y", y)
                     .getSingleResult();
-        } catch (NoResultException ignored) {}
+            session.close();
+        } catch (NoResultException ignored) {
+        }
         return coordinates;
     }
 

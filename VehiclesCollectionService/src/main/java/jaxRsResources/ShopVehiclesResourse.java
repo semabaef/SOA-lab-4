@@ -1,5 +1,8 @@
 package jaxRsResources;
 
+import exceptions.ExceptionDescription;
+import exceptions.HttpApplicationException;
+import models.enums.VehicleType;
 import services.ShopVehiclesService;
 
 import javax.ejb.EJB;
@@ -17,7 +20,13 @@ public class ShopVehiclesResourse {
 
     @GET
     @Path("/search/by-type/{type}")
-    public Response searchVehiclesByType(@PathParam("type") String type) {
+    public Response searchVehiclesByType(@PathParam("type") String typeString) {
+        VehicleType type;
+        try {
+            type = Enum.valueOf(VehicleType.class, typeString);
+        } catch (Exception e){
+            throw new HttpApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
+        }
         return Response.ok(shopVehiclesService.searchVehiclesByType(type)).build();
     }
 
