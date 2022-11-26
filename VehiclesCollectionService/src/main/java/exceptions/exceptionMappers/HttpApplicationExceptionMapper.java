@@ -12,8 +12,8 @@ public class HttpApplicationExceptionMapper implements ExceptionMapper<HttpAppli
 
     @Override
     public Response toResponse(HttpApplicationException exception) {
-        return Response.status(Response.Status.NOT_FOUND)
-                .entity(exception.toString())
+        return Response.status(exception.getCode())
+                .entity(exception.getMessage())
                 .type(MediaType.APPLICATION_XML_TYPE)
                 .build();
     }

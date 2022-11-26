@@ -32,6 +32,7 @@ public class ListVehicleMessageBodyWriter implements MessageBodyWriter<List<Vehi
     public void writeTo(List<VehicleWithIdDTO> vehicleWithIdDTOS, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
         Writer writer = new PrintWriter(outputStream);
         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        writer.write("<VehiclesList>");
         vehicleWithIdDTOS.stream().forEach((vehicle) -> {
                     try {
                         writer.write("<Vehicle>");
@@ -52,6 +53,7 @@ public class ListVehicleMessageBodyWriter implements MessageBodyWriter<List<Vehi
                     }
                 }
         );
+        writer.write("</VehiclesList>");
         writer.flush();
         writer.close();
     }
