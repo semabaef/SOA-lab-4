@@ -8,5 +8,6 @@ public enum SortByType {
     creationDate,
     enginePower,
     numberOfWheels,
-    distanceTravelled
+    distanceTravelled,
+    type
 }
