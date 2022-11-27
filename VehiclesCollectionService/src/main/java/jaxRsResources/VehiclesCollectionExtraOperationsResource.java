@@ -19,7 +19,7 @@ public class VehiclesCollectionExtraOperationsResource {
     @GET
     @Path("/count/type")
     public Response getCountVehiclesWhereTypeIs(@QueryParam("type") String type) {
-        return Response.ok(vehicleService.countVehiclesWhereTypeIs(type).toString()).build();
+        return Response.ok(vehicleService.countVehiclesWhereTypeIs(type)).build();
     }
 
 

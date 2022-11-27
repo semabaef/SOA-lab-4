@@ -1,6 +1,7 @@
 package services;
 
 import models.dto.common.VehicleFilterDTO;
+import models.dto.common.VehiclesCountDTO;
 import models.dto.vehicle.VehicleNoIdDTO;
 import models.dto.vehicle.VehicleWithIdDTO;
 
@@ -19,7 +20,7 @@ public interface VehicleService {
 
     List<VehicleWithIdDTO> getAllVehiclesWithFilter(VehicleFilterDTO filterDTO);
 
-    Long countVehiclesWhereTypeIs(String type);
+    VehiclesCountDTO countVehiclesWhereTypeIs(String type);
 
     List<VehicleWithIdDTO> getVehiclesWhereNameLike(String name);
 

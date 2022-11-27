@@ -7,6 +7,7 @@ import exceptions.ExceptionDescription;
 import exceptions.HttpApplicationException;
 import lombok.SneakyThrows;
 import models.dto.common.VehicleFilterDTO;
+import models.dto.common.VehiclesCountDTO;
 import models.dto.vehicle.VehicleNoIdDTO;
 import models.dto.vehicle.VehicleWithIdDTO;
 import models.entities.Coordinates;
@@ -123,8 +124,8 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public Long countVehiclesWhereTypeIs(String type) {
-        return vehicleExtraOperationsDao.countVehiclesWhereTypeIs(type);
+    public VehiclesCountDTO countVehiclesWhereTypeIs(String type) {
+        return VehiclesCountDTO.builder().count(vehicleExtraOperationsDao.countVehiclesWhereTypeIs(type)).build();
     }
 
     @SneakyThrows
