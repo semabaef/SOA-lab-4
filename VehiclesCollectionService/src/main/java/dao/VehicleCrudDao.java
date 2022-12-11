@@ -1,5 +1,7 @@
 package dao;
 
+import exceptions.ExceptionDescription;
+import exceptions.RestApplicationException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.*;
@@ -9,10 +11,13 @@ import models.enums.SortOrder;
 import models.enums.VehicleType;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import remoteService.RestClient;
+import utils.convertors.EntityConvertor;
 
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ws.rs.core.Response;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +30,12 @@ public class VehicleCrudDao {
 
     @EJB
     private CoordinatesDao coordinatesDao;
+
+    @EJB
+    private RestClient restClient;
+
+    @EJB
+    private EntityConvertor entityConvertor;
 
     public Vehicle findById(Long id) {
         Vehicle vehicle = null;
@@ -42,7 +53,12 @@ public class VehicleCrudDao {
         Session session = getSessionFactory().openSession();
         Transaction tx1 = session.beginTransaction();
         session.persist(vehicle);
-        tx1.commit();
+        if (sendRequestToElasticsearch("save", vehicle) == 201) {
+            tx1.commit();
+        } else {
+            tx1.rollback();
+            throw new RestApplicationException(ExceptionDescription.INTERNAL_SERVER_ERROR);
+        }
         session.close();
     }
 
@@ -51,7 +67,12 @@ public class VehicleCrudDao {
         Session session = getSessionFactory().openSession();
         Transaction tx1 = session.beginTransaction();
         session.update(vehicle);
-        tx1.commit();
+        if (sendRequestToElasticsearch("update", vehicle) == 200) {
+            tx1.commit();
+        } else {
+            tx1.rollback();
+            throw new RestApplicationException(ExceptionDescription.INTERNAL_SERVER_ERROR);
+        }
         session.close();
     }
 
@@ -60,7 +81,12 @@ public class VehicleCrudDao {
         Session session = getSessionFactory().openSession();
         Transaction tx1 = session.beginTransaction();
         session.remove(vehicle);
-        tx1.commit();
+        if (sendRequestToElasticsearch("delete", vehicle) == 200) {
+            tx1.commit();
+        }else {
+            tx1.rollback();
+            throw new RestApplicationException(ExceptionDescription.INTERNAL_SERVER_ERROR);
+        }
         session.close();
     }
 
@@ -153,4 +179,17 @@ public class VehicleCrudDao {
         }
         return objectPath;
     }
+
+    private Integer sendRequestToElasticsearch(String command, Vehicle vehicle) {
+        Response response = null;
+        if (command.equals("save"))
+            response = restClient.sendNewVehicleToElasticsearchService(entityConvertor.convertVehicleEntityToDTO(vehicle));
+        if (command.equals("update"))
+            response = restClient.sendUpdatingVehicleToElasticsearchService(entityConvertor.convertVehicleEntityToDTO(vehicle));
+        if (command.equals("delete"))
+            response = restClient.sendRemovalRequestVehicleToElasticsearchService(vehicle.getId());
+        assert response != null;
+        return response.getStatus();
+    }
+
 }

@@ -1,9 +1,8 @@
 package utils.messageBodyReaders;
 
 import exceptions.ExceptionDescription;
-import exceptions.HttpApplicationException;
+import exceptions.RestApplicationException;
 import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import models.dto.vehicle.VehicleNoIdDTO;
 
@@ -36,7 +35,7 @@ public class VehicleNoIdMessageBodyReader implements MessageBodyReader<VehicleNo
             toJava = context.createUnmarshaller();
             vehicle = (VehicleNoIdDTO) toJava.unmarshal(entityStream);
         } catch (Exception e) {
-            throw new HttpApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
+            throw new RestApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
         }
         return vehicle;
     }

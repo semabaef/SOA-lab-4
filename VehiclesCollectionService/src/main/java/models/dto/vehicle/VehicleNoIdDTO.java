@@ -2,7 +2,7 @@ package models.dto.vehicle;
 
 
 import exceptions.ExceptionDescription;
-import exceptions.HttpApplicationException;
+import exceptions.RestApplicationException;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -35,29 +35,35 @@ public class VehicleNoIdDTO {
     private VehicleType type;
 
     public void validate() {
+        boolean fail = false;
+
         if (this.name == null || this.name.isEmpty())
-            throw new HttpApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
+            fail = true;
 
         if (this.coordinates == null)
-            throw new HttpApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
+            fail = true;
 
         if (this.enginePower <= 0)
-            throw new HttpApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
+            fail = true;
 
         if (this.numberOfWheels == null || this.numberOfWheels <= 0)
-            throw new HttpApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
+            fail = true;
 
         if (this.distanceTravelled <= 0)
-            throw new HttpApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
+            fail = true;
 
         if (this.typeString != null) {
             try {
                 this.type = Enum.valueOf(VehicleType.class, this.typeString);
             } catch (Exception e) {
-                throw new HttpApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
+                fail = true;
             }
         } else
-            throw new HttpApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
+            fail = true;
+
+        if (fail)
+            throw new RestApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
+
     }
 
 }

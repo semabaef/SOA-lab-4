@@ -1,7 +1,7 @@
 package jaxRsResources;
 
 import exceptions.ExceptionDescription;
-import exceptions.HttpApplicationException;
+import exceptions.RestApplicationException;
 import models.enums.VehicleType;
 import services.ShopVehiclesService;
 
@@ -25,7 +25,7 @@ public class ShopVehiclesResourse {
         try {
             type = Enum.valueOf(VehicleType.class, typeString);
         } catch (Exception e){
-            throw new HttpApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
+            throw new RestApplicationException(ExceptionDescription.INVALID_REQUEST_ARGUMENTS);
         }
         return Response.ok(shopVehiclesService.searchVehiclesByType(type)).build();
     }

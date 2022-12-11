@@ -4,7 +4,7 @@ import dao.CoordinatesDao;
 import dao.VehicleCrudDao;
 import dao.VehicleExtraOperationsDao;;
 import exceptions.ExceptionDescription;
-import exceptions.HttpApplicationException;
+import exceptions.RestApplicationException;
 import lombok.SneakyThrows;
 import models.dto.common.VehicleFilterDTO;
 import models.dto.common.VehiclesCountDTO;
@@ -16,8 +16,8 @@ import models.enums.SortByType;
 import models.enums.SortOrder;
 import services.CoordinatesService;
 import services.VehicleService;
-import utils.convectors.DtoConvector;
-import utils.convectors.EntityConvector;
+import utils.convertors.DtoConvertor;
+import utils.convertors.EntityConvertor;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -41,25 +41,25 @@ public class VehicleServiceImpl implements VehicleService {
     private VehicleExtraOperationsDao vehicleExtraOperationsDao;
 
     @EJB
-    private DtoConvector dtoConvector;
+    private DtoConvertor dtoConvertor;
 
     @EJB
-    private EntityConvector entityConvector;
+    private EntityConvertor entityConvertor;
 
     @Override
     public VehicleWithIdDTO addNewVehicle(VehicleNoIdDTO vehicleNoIdDTO) {
-        Vehicle vehicle = dtoConvector.convertVehicleNoIdDtoToEntity(vehicleNoIdDTO);
+        Vehicle vehicle = dtoConvertor.convertVehicleNoIdDtoToEntity(vehicleNoIdDTO);
         Coordinates coordinates = coordinatesService.checkAndSaveCoordinatesIfAreNotInBD(vehicle.getCoordinates());
         vehicle.setCoordinates(coordinates);
         vehicleCrudDao.save(vehicle);
-        return entityConvector.convertVehicleEntityToDTO(vehicle);
+        return entityConvertor.convertVehicleEntityToDTO(vehicle);
     }
 
     @SneakyThrows
     @Override
     public VehicleWithIdDTO updateVehicle(VehicleWithIdDTO vehicleWithIdDTO) {
         Vehicle vehicle = findAndCheckVehicleById(vehicleWithIdDTO.getId());
-        vehicle = dtoConvector.convertVehicleWithIdlDtoToEntity(vehicleWithIdDTO);
+        vehicle = dtoConvertor.convertVehicleWithIdlDtoToEntity(vehicleWithIdDTO);
         Coordinates coordinates = coordinatesService.checkAndSaveCoordinatesIfAreNotInBD(vehicle.getCoordinates());
         vehicle.setCoordinates(coordinates);
         vehicleCrudDao.update(vehicle);
@@ -70,7 +70,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleWithIdDTO getVehicleById(Long id) {
         Vehicle vehicle = findAndCheckVehicleById(id);
-        return entityConvector.convertVehicleEntityToDTO(vehicle);
+        return entityConvertor.convertVehicleEntityToDTO(vehicle);
     }
 
     @SneakyThrows
@@ -78,7 +78,7 @@ public class VehicleServiceImpl implements VehicleService {
     public VehicleWithIdDTO deleteVehicleById(Long id) {
         Vehicle vehicle = findAndCheckVehicleById(id);
         vehicleCrudDao.delete(vehicle);
-        return entityConvector.convertVehicleEntityToDTO(vehicle);
+        return entityConvertor.convertVehicleEntityToDTO(vehicle);
     }
 
 
@@ -120,7 +120,7 @@ public class VehicleServiceImpl implements VehicleService {
                     fieldToFilter,
                     filterDTO.getPage(),
                     filterDTO.getLimit());
-        return entityConvector.convertAndCheckListVehicles(vehicles);
+        return entityConvertor.convertAndCheckListVehicles(vehicles);
     }
 
     @Override
@@ -132,20 +132,20 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public List<VehicleWithIdDTO> getVehiclesWhereNameLike(String name) {
         List<Vehicle> vehicles = vehicleExtraOperationsDao.getVehiclesWhereNameLike(name);
-        return entityConvector.convertAndCheckListVehicles(vehicles);
+        return entityConvertor.convertAndCheckListVehicles(vehicles);
     }
 
     @SneakyThrows
     @Override
     public List<VehicleWithIdDTO> getVehiclesWhereEnginePowerIsLessThan(Integer enginePower) {
         List<Vehicle> vehicles = vehicleExtraOperationsDao.getVehiclesWhereEnginePowerIsLessThan(enginePower);
-        return entityConvector.convertAndCheckListVehicles(vehicles);
+        return entityConvertor.convertAndCheckListVehicles(vehicles);
     }
 
     private Vehicle findAndCheckVehicleById(Long id) {
         Vehicle vehicle = vehicleCrudDao.findById(id);
         if (vehicle == null)
-            throw new HttpApplicationException(ExceptionDescription.OBJECT_VEHICLE_NOT_FOUND);
+            throw new RestApplicationException(ExceptionDescription.OBJECT_VEHICLE_NOT_FOUND);
         return vehicle;
     }
 

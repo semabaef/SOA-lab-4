@@ -6,7 +6,7 @@ import models.dto.vehicle.VehicleWithIdDTO;
 import models.entities.Vehicle;
 import models.enums.VehicleType;
 import services.ShopVehiclesService;
-import utils.convectors.EntityConvector;
+import utils.convertors.EntityConvertor;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -16,7 +16,7 @@ import java.util.List;
 public class ShopVehiclesServiceImpl implements ShopVehiclesService {
 
     @EJB
-    private EntityConvector entityConvector;
+    private EntityConvertor entityConvertor;
 
     @EJB
     private ShopDao shopDao;
@@ -24,14 +24,14 @@ public class ShopVehiclesServiceImpl implements ShopVehiclesService {
     @Override
     public List<VehicleWithIdDTO> searchVehiclesByType(VehicleType type) {
         List<Vehicle> vehicles = shopDao.getAllVehiclesByType(type);
-        return entityConvector.convertAndCheckListVehicles(vehicles);
+        return entityConvertor.convertAndCheckListVehicles(vehicles);
     }
 
     @SneakyThrows
     @Override
     public List<VehicleWithIdDTO> searchVehiclesByEnginePowerInRange(Integer minEnginePower, Integer maxEnginePower) {
         List<Vehicle> vehicles = shopDao.getAllVehiclesByEnginePowerInRange(minEnginePower, maxEnginePower);
-        return entityConvector.convertAndCheckListVehicles(vehicles);
+        return entityConvertor.convertAndCheckListVehicles(vehicles);
 
     }
 
