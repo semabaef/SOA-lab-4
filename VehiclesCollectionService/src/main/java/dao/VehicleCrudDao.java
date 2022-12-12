@@ -83,7 +83,7 @@ public class VehicleCrudDao {
         session.remove(vehicle);
         if (sendRequestToElasticsearch("delete", vehicle) == 200) {
             tx1.commit();
-        }else {
+        } else {
             tx1.rollback();
             throw new RestApplicationException(ExceptionDescription.INTERNAL_SERVER_ERROR);
         }
@@ -150,10 +150,14 @@ public class VehicleCrudDao {
                     break;
                 }
                 case "x": {
-                    predicates.add(builder.equal(root.get("coordinates").get("x"), entry.getValue()));
+                    Path<Object> objectPath = root.get("coordinates").get("x");
+                    predicates.add(builder.equal(objectPath, entry.getValue()));
+                    break;
                 }
                 case "y": {
-                    predicates.add(builder.equal(root.get("coordinates").get("y"), entry.getValue()));
+                    Path<Object> objectPath = root.get("coordinates").get("y");
+                    predicates.add(builder.equal(objectPath, entry.getValue()));
+                    break;
                 }
                 default: {
                     predicates.add(builder.equal(root.get(entry.getKey()), entry.getValue()));

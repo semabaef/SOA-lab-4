@@ -8,11 +8,15 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import models.dto.coordinates.CoordinatesDTO;
 import models.enums.VehicleType;
 
 
 @Data
+@Getter
+@Setter
 @XmlRootElement(name = "Vehicle")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class VehicleNoIdDTO {
@@ -49,7 +53,7 @@ public class VehicleNoIdDTO {
         if (this.numberOfWheels == null || this.numberOfWheels <= 0)
             fail = true;
 
-        if (this.distanceTravelled <= 0)
+        if (this.distanceTravelled == null || this.distanceTravelled <= 0)
             fail = true;
 
         if (this.typeString != null) {
