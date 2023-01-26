@@ -1,5 +1,6 @@
 package dao;
 
+
 import exceptions.ExceptionDescription;
 import exceptions.RestApplicationException;
 import jakarta.persistence.EntityManager;
@@ -27,6 +28,7 @@ import static configuration.HibernateSessionFactoryConfig.getSessionFactory;
 
 @Stateless
 public class VehicleCrudDao {
+
 
     @EJB
     private CoordinatesDao coordinatesDao;
@@ -85,6 +87,7 @@ public class VehicleCrudDao {
             tx1.commit();
         } else {
             tx1.rollback();
+
             throw new RestApplicationException(ExceptionDescription.INTERNAL_SERVER_ERROR);
         }
         session.close();
@@ -142,7 +145,7 @@ public class VehicleCrudDao {
         for (Map.Entry<String, String> entry : fieldToVal.entrySet()) {
             switch (entry.getKey()) {
                 case "creationDate": {
-                    predicates.add(builder.equal(root.get(entry.getKey()), ZonedDateTime.parse(entry.getValue())));
+                    predicates.add(builder.equal(root.get(entry.getKey()), entry.getValue()));
                     break;
                 }
                 case "type": {
