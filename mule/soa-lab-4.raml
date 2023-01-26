@@ -1,0 +1,56 @@
+#%RAML 1.0
+title: soa-lab-4
+baseUri: shopvehicles
+
+mediaType:
+  application/json
+
+annotationTypes:
+  monitoringInterval:
+    type: integer
+
+/search/by-type/{type}:
+  get:
+    description: god search
+    responses:
+      200:
+        body:
+          type: object
+      400:
+        body:
+          type: object
+      404:
+        body:
+          type: object
+      500:
+        body:
+          type: object
+    securedBy: []
+  options:
+    displayName: Options
+    responses:
+      200: {}
+    securedBy: []
+
+/search/by-engine-power/{from}/{to}:
+  get:
+    description: satan search
+    responses:
+      200:
+        body:
+          type: object
+      400:
+        body:
+          type: object
+      404:
+        body:
+          type: object
+      500:
+        body:
+          type: object
+    securedBy: []
+  options:
+    displayName: Options
+    responses:
+      200: {}
+    securedBy: []

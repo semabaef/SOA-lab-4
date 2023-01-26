@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+    <http:listener-config name="soa-lab-4-httpListenerConfig" basePath="shopvehicles">
+        <http:listener-connection host="0.0.0.0" port="6667" />
+    </http:listener-config>
+    <apikit:config name="soa-lab-4-config" api="soa-lab-4.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="753e52ca-13f5-4197-b06b-05ff2c29b767" basePath="shopvehicles">
+        <http:listener-connection host="0.0.0.0" port="6666" />
+    </http:listener-config>
+    <wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="ff1afd13-b28b-4f08-9265-3c3abbad3f00" >
+        <wsc:connection wsdlLocation="http://localhost:6363/ws/schema.wsdl?wsdl" service="SchemaPortService" port="SchemaPortSoap11" address="http://localhost:6363/ws" >
+            <wsc:web-service-security actor="http://schemas.xmlsoap.org/soap/actor/next" />
+        </wsc:connection>
+    </wsc:config>
+    <wsc:config name="Web_Service_Consumer_Config1" doc:name="Web Service Consumer Config" doc:id="7f09c810-5750-44bd-b9ec-fecf3ff82285" >
+        <wsc:connection wsdlLocation="http://localhost:6363/ws/schema.wsdl?wsdl" service="SchemaPortService" port="SchemaPortSoap11" address="http://localhost:6363/ws" />
+    </wsc:config>
+    <flow name="soa-lab-4-main">
+        <http:listener config-ref="HTTP_Listener_config" path="/*" doc:name="HTTP">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="soa-lab-4-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="soa-lab-4-console">
+        <http:listener config-ref="soa-lab-4-httpListenerConfig" path="/*" doc:name="HTTP">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="soa-lab-4-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="options:\search\by-engine-power\(from)\(to):soa-lab-4-config">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="from">attributes.uriParams.'from'</ee:set-variable>
+                <ee:set-variable variableName="to">attributes.uriParams.'to'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="options:\search\by-engine-power\(from)\(to):soa-lab-4-config" />
+    </flow>
+    <flow name="options:\search\by-type\(type):soa-lab-4-config">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="type">attributes.uriParams.'type'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="options:\search\by-type\(type):soa-lab-4-config" />
+    </flow>
+    <flow name="get:\search\by-engine-power\(from)\(to):soa-lab-4-config">
+        <logger level="INFO" message="get:\search\by-engine-power\(from)\(to):soa-lab-4-config" />
+        <ee:transform doc:id="8ae7168f-5c03-48a0-8915-712abff7704c">
+            <ee:variables>
+                <ee:set-variable variableName="from"><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://semabaef/shop/search
+---
+{
+	ns0#searchVehiclesByEnginePowerInRangeRequest:{
+		from: attributes.uriParams.from,
+		to: attributes.uriParams.to
+	}
+}]]></ee:set-variable>
+                <ee:set-variable variableName="to"><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://semabaef/shop/search
+---
+{
+	ns0#searchVehiclesByEnginePowerInRangeRequest: {
+		ns0#from: attributes.uriParams.from,
+		ns0#to: attributes.uriParams.to
+	}
+}]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <wsc:consume doc:name="Consume" doc:id="60d620b6-8f13-4c47-b48a-ae6d0861af59" config-ref="Web_Service_Consumer_Config" operation="searchVehiclesByEnginePowerInRange">
+            <wsc:message >
+                <wsc:body ><![CDATA[#[output application/xml
+ns ns0 http://semabaef/shop/search
+---
+{
+	ns0#searchVehiclesByEnginePowerInRangeRequest: {
+		ns0#from: attributes.uriParams.from,
+		ns0#to: attributes.uriParams.to
+	}
+}]]]></wsc:body>
+            </wsc:message>
+        </wsc:consume>
+        <ee:transform doc:name="Transform Message" doc:id="5de23c55-e8ea-4eda-82d3-ff1c6760f4f1" >
+            <ee:message >
+                <ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://semabaef/shop/search
+---
+payload.body.ns0#searchVehiclesByEnginePowerInRangeResponse.*ns0#List
+
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\search\by-type\(type):soa-lab-4-config">
+        <logger level="INFO" message="get:\search\by-type\(type):soa-lab-4-config" />
+        <ee:transform doc:id="a161296c-8303-4adc-a74e-73f98734a58d">
+            <ee:variables>
+                <ee:set-variable variableName="type"><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://semabaef/shop/search
+---
+{
+	ns0#searchVehiclesByTypeRequest:{
+		ns0#"type": attributes.uriParams."type"
+	}
+
+}]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <wsc:consume doc:name="Consume" doc:id="d48b6720-a087-4836-9de5-1932d328b6ee" config-ref="Web_Service_Consumer_Config1" operation="searchVehiclesByType">
+            <wsc:message >
+                <wsc:body ><![CDATA[#[%dw 2.0
+output application/xml
+ns ns0 http://semabaef/shop/search
+---
+{
+	ns0#searchVehiclesByTypeRequest:{
+		ns0#"type": attributes.uriParams."type"
+	}
+
+}]]]></wsc:body>
+            </wsc:message>
+        </wsc:consume>
+        <ee:transform doc:name="Transform Message" doc:id="89dd3b74-552a-4778-8bd8-3c52ac9c3088" >
+            <ee:message >
+                <ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://semabaef/shop/search
+---
+payload.body.ns0#searchVehiclesByTypeResponse.*ns0#List
+
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>
