@@ -37,6 +37,9 @@ public class Vehicle {
     @Column(name = "creation_date")
     private java.time.LocalDateTime creationDate;
 
+    @Column(name = "creation_day")
+    private String creationDay;
+
     @Range(min = 1)
     @Column(name = "engine_power")
     private Integer enginePower;
