@@ -5,6 +5,7 @@ import models.dto.vehicle.VehicleNoIdDTO;
 import models.dto.vehicle.VehicleWithIdDTO;
 import models.enums.VehicleType;
 import services.VehicleService;
+import utils.validators.CommonValidator;
 
 import javax.ejb.EJB;
 import javax.ws.rs.*;
@@ -19,6 +20,9 @@ public class VehiclesCollectionCrudResource {
 
     @EJB
     private VehicleService vehicleService;
+
+    @EJB
+    private CommonValidator validator;
 
 
     @POST
@@ -69,16 +73,20 @@ public class VehiclesCollectionCrudResource {
 
     @GET
     @Path("/{id}")
-    public Response getVehicleById(@PathParam("id") Long id) {
+    public Response getVehicleById(@PathParam("id") String idText) {
+        Long id = validator.validateLong(idText);
         return Response.ok(vehicleService.getVehicleById(id)).build();
     }
 
 
     @DELETE
     @Path("/{id}")
-    public Response deleteVehicleById(@PathParam("id") Long id) {
+    public Response deleteVehicleById(@PathParam("id") String idText) {
+        Long id = validator.validateLong(idText);
         return Response.ok(vehicleService.deleteVehicleById(id)).build();
     }
+
+
 
 }
 
