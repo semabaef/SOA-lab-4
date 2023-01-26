@@ -1,5 +1,6 @@
 package remoteService;
 
+
 import exceptions.ExceptionDescription;
 import exceptions.RestApplicationException;
 import models.dto.vehicle.VehicleWithIdDTO;
@@ -16,6 +17,7 @@ import static remoteService.ShopServiceEndpoints.*;
 @Stateless
 public class RestClient {
 
+
     private final Client client = ClientBuilder.newClient();
 
 
@@ -26,6 +28,7 @@ public class RestClient {
                     .request(MediaType.APPLICATION_XML)
                     .post(Entity.xml(writeVehicleDtoToXML(vehicleDTO)));
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RestApplicationException(ExceptionDescription.INTERNAL_SERVER_ERROR);
         }
         return response;
@@ -38,6 +41,7 @@ public class RestClient {
                     .request(MediaType.APPLICATION_XML)
                     .put(Entity.xml(writeVehicleDtoToXML(vehicleDTO)));
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RestApplicationException(ExceptionDescription.INTERNAL_SERVER_ERROR);
         }
         return response;
@@ -51,6 +55,7 @@ public class RestClient {
                     .request(MediaType.APPLICATION_XML)
                     .delete();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RestApplicationException(ExceptionDescription.INTERNAL_SERVER_ERROR);
         }
         return response;

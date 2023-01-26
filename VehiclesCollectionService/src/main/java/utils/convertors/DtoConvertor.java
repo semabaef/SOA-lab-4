@@ -17,6 +17,7 @@ public class DtoConvertor {
         Vehicle vehicle = new Vehicle();
         vehicle.setName(vehicleNoIdDTO.getName());
         vehicle.setCoordinates(convertCoordinatesDtoToEntity(vehicleNoIdDTO.getCoordinates()));
+        vehicle.setCreationDay(getNowDay());
         vehicle.setCreationDate(LocalDateTime.now());
         vehicle.setEnginePower(vehicleNoIdDTO.getEnginePower());
         vehicle.setNumberOfWheels(vehicleNoIdDTO.getNumberOfWheels());
@@ -30,6 +31,7 @@ public class DtoConvertor {
         vehicle.setId(vehicleWithIdDTO.getId());
         vehicle.setName(vehicleWithIdDTO.getName());
         vehicle.setCoordinates(convertCoordinatesDtoToEntity(vehicleWithIdDTO.getCoordinates()));
+        vehicle.setCreationDay(parseDay(LocalDateTime.parse(vehicleWithIdDTO.getCreationDate())));
         vehicle.setCreationDate(LocalDateTime.parse(vehicleWithIdDTO.getCreationDate()));
         vehicle.setEnginePower(vehicleWithIdDTO.getEnginePower());
         vehicle.setNumberOfWheels(vehicleWithIdDTO.getNumberOfWheels());
@@ -46,4 +48,18 @@ public class DtoConvertor {
     }
 
 
+    private String getNowDay(){
+        LocalDateTime now = LocalDateTime.now();
+        int year = now.getYear();
+        int month = now.getMonthValue();
+        int day = now.getDayOfMonth();
+        return String.format("%d-%02d-%02d", year,month,day);
+    }
+
+    private String parseDay(LocalDateTime localDateTime){
+        int year = localDateTime.getYear();
+        int month = localDateTime.getMonthValue();
+        int day = localDateTime.getDayOfMonth();
+        return String.format("%d-%02d-%02d", year,month,day);
+    }
 }

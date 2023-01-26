@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://semabaef/shop/search"
+           targetNamespace="http://semabaef/shop/search"
+           elementFormDefault="qualified">
+
+    <xs:element name="searchVehiclesByTypeRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="type" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="searchVehiclesByTypeResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="List" nillable="true" type="tns:VehicleDTO"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="searchVehiclesByEnginePowerInRangeRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="from" type="xs:string"/>
+                <xs:element name="to" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="searchVehiclesByEnginePowerInRangeResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="List"  nillable="true" type="tns:VehicleDTO"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="CoordinatesDTO">
+        <xs:sequence>
+            <xs:element name="x" type="xs:float" minOccurs="0"/>
+            <xs:element name="y" type="xs:long" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="VehicleDTO">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="creationDate" type="xs:string"/>
+            <xs:element name="coordinates" type="tns:CoordinatesDTO"/>
+            <xs:element name="enginePower" type="xs:int"/>
+            <xs:element name="numberOfWheels" type="xs:long"/>
+            <xs:element name="distanceTravelled" type="xs:double"/>
+            <xs:element name="type" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+</xs:schema>

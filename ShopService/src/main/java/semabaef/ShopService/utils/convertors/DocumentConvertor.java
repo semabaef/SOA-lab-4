@@ -46,4 +46,23 @@ public class DocumentConvertor {
         return vehicles.stream().map(this::convertVehicleDocumentToDTO).collect(Collectors.toList());
     }
 
+    public List<semabaef.shop.search.VehicleDTO> convertListVehicleToListSoapDTO(List<Vehicle> vehicles) {
+        return vehicles.stream().map(this::convertVehicleDocumentToSoapDTO).collect(Collectors.toList());
+    }
+
+    public semabaef.shop.search.VehicleDTO convertVehicleDocumentToSoapDTO(Vehicle vehicle) {
+        semabaef.shop.search.VehicleDTO vehicleDTO = new semabaef.shop.search.VehicleDTO();
+        vehicleDTO.setId(Long.valueOf(vehicle.getId()));
+        vehicleDTO.setName(vehicle.getName());
+        semabaef.shop.search.CoordinatesDTO coordinatesDTO = new semabaef.shop.search.CoordinatesDTO();
+        coordinatesDTO.setX(vehicle.getX());
+        coordinatesDTO.setY(vehicle.getY());
+        vehicleDTO.setCoordinates(coordinatesDTO);
+        vehicleDTO.setCreationDate(vehicle.getCreationDate());
+        vehicleDTO.setEnginePower(vehicle.getEnginePower());
+        vehicleDTO.setNumberOfWheels(vehicle.getNumberOfWheels());
+        vehicleDTO.setDistanceTravelled(vehicle.getDistanceTravelled());
+        vehicleDTO.setType(vehicle.getType().name());
+        return vehicleDTO;
+    }
 }
