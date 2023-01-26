@@ -51,7 +51,7 @@ public class VehicleWithIdDTO {
         if (this.name == null || this.name.isEmpty())
             fail = true;
 
-        if (this.coordinates == null)
+        if (this.coordinates == null || this.coordinates.getX() == null || this.coordinates.getY() == null)
             fail = true;
 
         if (this.enginePower <= 0)
