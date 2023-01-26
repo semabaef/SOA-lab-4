@@ -46,15 +46,15 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public List<VehicleDTO> searchVehiclesByType(VehicleType type) {
+    public List<semabaef.shop.search.VehicleDTO> searchVehiclesByType(VehicleType type) {
         List<Vehicle> vehicles = vehicleRepository.findAllByVehicleType(type);
-        return documentConvertor.convertListVehicleToListDTO(vehicles);
+        return documentConvertor.convertListVehicleToListSoapDTO(vehicles);
     }
 
     @Override
-    public List<VehicleDTO> searchVehiclesByEnginePowerInRange(Integer min, Integer max) {
+    public List<semabaef.shop.search.VehicleDTO> searchVehiclesByEnginePowerInRange(Integer min, Integer max) {
         List<Vehicle> vehicles = vehicleRepository.findAllByEnginePowerIsBetween(min, max);
-        return documentConvertor.convertListVehicleToListDTO(vehicles);
+        return documentConvertor.convertListVehicleToListSoapDTO(vehicles);
     }
 
     private Vehicle findById(Long id) {

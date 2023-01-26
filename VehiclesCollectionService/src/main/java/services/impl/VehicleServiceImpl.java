@@ -92,7 +92,7 @@ public class VehicleServiceImpl implements VehicleService {
         if (filterDTO.getName() != null)
             fieldToFilter.put("name", filterDTO.getName());
         if (filterDTO.getCreationDate() != null)
-            fieldToFilter.put("creationDate", filterDTO.getCreationDate());
+            fieldToFilter.put("creationDay", filterDTO.getCreationDate());
         if (filterDTO.getX() != null)
             fieldToFilter.put("x", filterDTO.getX().toString());
         if (filterDTO.getY() != null)
@@ -120,7 +120,7 @@ public class VehicleServiceImpl implements VehicleService {
                     fieldToFilter,
                     filterDTO.getPage(),
                     filterDTO.getLimit());
-        return entityConvertor.convertAndCheckListVehicles(vehicles);
+        return convertAndCheckListVehicles(vehicles);
     }
 
     @Override
@@ -132,14 +132,14 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public List<VehicleWithIdDTO> getVehiclesWhereNameLike(String name) {
         List<Vehicle> vehicles = vehicleExtraOperationsDao.getVehiclesWhereNameLike(name);
-        return entityConvertor.convertAndCheckListVehicles(vehicles);
+        return convertAndCheckListVehicles(vehicles);
     }
 
     @SneakyThrows
     @Override
     public List<VehicleWithIdDTO> getVehiclesWhereEnginePowerIsLessThan(Integer enginePower) {
         List<Vehicle> vehicles = vehicleExtraOperationsDao.getVehiclesWhereEnginePowerIsLessThan(enginePower);
-        return entityConvertor.convertAndCheckListVehicles(vehicles);
+        return convertAndCheckListVehicles(vehicles);
     }
 
     private Vehicle findAndCheckVehicleById(Long id) {
@@ -149,4 +149,10 @@ public class VehicleServiceImpl implements VehicleService {
         return vehicle;
     }
 
+    private List<VehicleWithIdDTO> convertAndCheckListVehicles(List<Vehicle> vehicles) {
+        if (vehicles.isEmpty())
+            throw new RestApplicationException(ExceptionDescription.OBJECT_VEHICLES_NOT_FOUND);
+        return entityConvertor.convertListVehicleToListDTO(vehicles);
+
+    }
 }

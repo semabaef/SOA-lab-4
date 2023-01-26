@@ -13,7 +13,7 @@ public interface VehicleService {
 
     VehicleDTO deleteVehicleById(Long id);
 
-    List<VehicleDTO> searchVehiclesByType(VehicleType type);
+    List<semabaef.shop.search.VehicleDTO> searchVehiclesByType(VehicleType type);
 
-    List<VehicleDTO> searchVehiclesByEnginePowerInRange(Integer min, Integer max);
+    List<semabaef.shop.search.VehicleDTO> searchVehiclesByEnginePowerInRange(Integer min, Integer max);
 }
